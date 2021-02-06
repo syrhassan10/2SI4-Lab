@@ -1,0 +1,181 @@
+import java.lang.String;
+import java.util.Random;
+
+public class HugeInteger {
+
+	private int[] values; // NULL array means number is 0;
+	private int num_of_digit;
+	private String num;
+	private int state = 1; // state 0 = negative, state 1 = positive
+
+	public HugeInteger(String val) throws IllegalArgumentException { // "3468" = [3,NULL,NULL,,]
+
+		num_of_digit = val.length();
+		values = new int[num_of_digit];
+		String temp;
+		num = val;
+
+		int j = 0;
+		int sh = 0;
+		if (val.charAt(0) == '-') {
+			state = 0;
+			sh = 1;
+		}
+
+		for (int i = sh; i < num_of_digit; i++) {
+			temp = val.substring(i, i + 1); // [0,1) "345"
+
+			try {
+				j = Integer.parseInt(temp);
+			} catch (Exception e) {
+				num = "0";
+				values = null;
+				throw new IllegalArgumentException("Character not allwed0");
+			}
+
+			values[i] = j;
+			// num += values[i];
+
+		}
+
+	}
+
+	public HugeInteger(int n) throws IllegalArgumentException {
+		if (n <= 0) {
+			values = null;
+			num = "0";
+			throw new IllegalArgumentException("Input must be greater than 0");
+		}
+		num_of_digit = n;
+		Random rand = new Random();
+		num = "";
+		values = new int[n];
+
+		int random_int = (int) (Math.random() * (9) + 1); // Math.raond() *(max-min+1) + min
+		values[0] = random_int;
+		num += values[0];
+		for (int i = 1; i < n; i++) {
+			int int_random = rand.nextInt(10); // produces integer from 0 - 9
+			values[i] = int_random;
+			num += values[i];
+
+		}
+	}
+
+	public HugeInteger add(HugeInteger h) {
+		HugeInteger answer;
+		String num_s = "";
+		String temp = "";
+		int carry = 0;
+		int num_1len = this.getDigit();
+		int num_2len = h.getDigit();
+		int temp2 =0;
+		if (this.getDigit() >= h.getDigit()) {// when 'this' array has more digits than h
+			int j = h.getDigit() - 1;
+			
+			if(this.getDigit() >= h.getDigit()) {
+				temp2 = this.getDigit();
+			}else {
+				temp2 = h.getDigit();
+			}
+
+			for (int i = this.getDigit() - 1; i >= 0; i--) {
+
+				// temp = "";
+
+				if (j >= 0) {
+					
+					//19
+					//03
+					
+					
+					if (this.values[i] + h.values[j] + carry > 9) {
+						temp = Integer.toString(this.values[i] + h.values[j] + carry); // convert the summation to a
+						num_s += temp.substring(1, 2); // extracts last digit if the two digit summation 12 = 2
+						carry = 1;
+
+					} else {
+						num_s += Integer.toString(this.values[i] + h.values[j] + carry); // if digit is 9 or less simply
+																							// // add
+						carry = 0;
+					}
+
+				} else {
+					if (this.values[i] + carry > 9) {
+						temp = Integer.toString(this.values[i] + carry); // convert the summation to a
+						// string for carry substring
+						num_s += temp.substring(1, 2); // extracts last digit if the two digit summation
+						carry = 1;
+					} else {
+						num_s += Integer.toString(this.values[i] + carry); // once we get
+						carry = 0; // MAKES CARRY 0
+
+					}
+
+				}
+				// counter++;
+				j--;
+			}
+			if (carry == 1) {
+				num_s += "1";
+			}
+		} else {// when 'h' array has more digits than this.values
+			int j = this.getDigit() - 1;
+			for (int i = h.getDigit() - 1; i >= 0; i--) {
+
+				// temp = "";
+
+				if (j >= 0) {
+					if (this.values[j] + h.values[i] + carry > 9) {
+						temp = Integer.toString(this.values[j] + h.values[i] + carry); // convert the summation to a
+																						// string for carry substring
+						num_s += temp.substring(1, 2); // extracts last digit if the two digit summation
+						carry = 1;
+
+					} else {
+						num_s += Integer.toString(this.values[j] + h.values[i] + carry); // if digit is 9 or less simply
+																							// add
+						carry = 0;
+
+					}
+				} else {
+
+					if (h.values[i] + carry > 9) {
+						temp = Integer.toString(h.values[i] + carry); // convert the summation to a
+						// string for carry substring
+						num_s += temp.substring(1, 2); // extracts last digit if the two digit summation
+						carry = 1;
+
+					} else {
+						num_s += Integer.toString(h.values[i] + carry); // once we get
+
+						carry = 0; // MAKES CARRY 0
+
+					}
+				}
+				j--;
+			}
+		}
+		// Reversing the string to get the solution
+
+		String rev = "";
+		for (int i = num_s.length() - 1; i >= 0; i--)
+			rev += num_s.charAt(i);
+
+		answer = new HugeInteger(rev); // initializing the new object to return
+
+		return answer;
+	}
+
+	public String toString() {
+
+		return num;
+
+	}
+
+	public int getDigit() {
+		return num_of_digit;
+
+	}
+
+}
